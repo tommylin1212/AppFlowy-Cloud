@@ -1,7 +1,16 @@
-# Essential services for AppFlowy Cloud
-
+# Non-essential additional services
 services:
-  nginx:
+ pgadmin:
+    env_file: stack.env
+    restart: on-failure
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    volumes:
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json
+ nginx:
+    env_file: stack.env
     restart: on-failure
     image: nginx
     ports:
@@ -13,7 +22,8 @@ services:
       - ./nginx/ssl/private_key.key:/etc/nginx/ssl/private_key.key
 
   # You do not need this if you have configured to use your own s3 file storage
-  minio:
+ minio:
+    env_file: stack.env
     restart: on-failure
     image: minio/minio
     environment:
@@ -24,7 +34,8 @@ services:
     volumes:
       - minio_data:/data
 
-  postgres:
+ postgres:
+    env_file: stack.env
     restart: on-failure
     build:
       context: ./postgres
@@ -38,11 +49,12 @@ services:
       - ./migrations/before:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
 
-  redis:
+ redis:
     restart: on-failure
     image: redis
 
-  gotrue:
+ gotrue:
+    env_file: stack.env
     restart: on-failure
     build:
       context: .
@@ -87,7 +99,8 @@ services:
       - GOTRUE_EXTERNAL_DISCORD_SECRET=${GOTRUE_EXTERNAL_DISCORD_SECRET}
       - GOTRUE_EXTERNAL_DISCORD_REDIRECT_URI=${GOTRUE_EXTERNAL_DISCORD_REDIRECT_URI}
 
-  appflowy_cloud:
+ appflowy_cloud:
+    env_file: stack.env
     restart: on-failure
     environment:
       - RUST_LOG=${RUST_LOG:-info}
@@ -122,7 +135,8 @@ services:
         FEATURES: ""
     image: appflowyinc/appflowy_cloud:${APPFLOWY_CLOUD_VERSION:-latest}
 
-  admin_frontend:
+ admin_frontend:
+    env_file: stack.env
     restart: on-failure
     build:
       context: .
@@ -134,7 +148,8 @@ services:
       - ADMIN_FRONTEND_GOTRUE_URL=${ADMIN_FRONTEND_GOTRUE_URL:-http://gotrue:9999}
       - ADMIN_FRONTEND_APPFLOWY_CLOUD_URL=${ADMIN_FRONTEND_APPFLOWY_CLOUD_URL:-http://appflowy_cloud:8000}
 
-  ai:
+ ai:
+    env_file: stack.env
     restart: on-failure
     image: appflowyinc/appflowy_ai:${APPFLOWY_AI_VERSION:-latest}
     environment:
@@ -142,7 +157,8 @@ services:
       - APPFLOWY_AI_SERVER_PORT=${APPFLOWY_AI_SERVER_PORT}
       - APPFLOWY_AI_DATABASE_URL=${APPFLOWY_AI_DATABASE_URL}
 
-  appflowy_history:
+ appflowy_history:
+    env_file: stack.env
     restart: on-failure
     image: appflowyinc/appflowy_history:${APPFLOWY_HISTORY_VERSION:-latest}
     build:
